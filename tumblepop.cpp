@@ -229,6 +229,14 @@ int main()
 		{
 			movX=speed;
 		}
+		if(Keyboard::isKeyPressed(Keyboard::Up))		//ADDED THE JUMP FUNCTION
+		{
+			if(onGround)
+			{
+				velocityY=jumpStrength;
+				onGround=false;
+			}
+		}
 
 		window.clear();
 
@@ -253,4 +261,5 @@ player_gravity(lvl, offset_y, velocityY, onGround, gravity, terminal_Velocity,
 
 	return 0;
 }
+
 

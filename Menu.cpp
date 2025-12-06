@@ -396,8 +396,7 @@ int main()
 				}
 				else if(current==4)
 				{
-					if (current == 4 && ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape)
-			window.close();
+					
 					if (ev.key.code == Keyboard::Down)
 					{
 						buttonText_P[selectedButton_P].setFillColor(Color(255, 140, 0)); // reset color
@@ -520,8 +519,7 @@ int main()
 				window.draw(buttonText_P[i]);
 			}
 
-			if (current == 4 && ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape)
-			window.close();
+			
 		}
 
 		window.display();

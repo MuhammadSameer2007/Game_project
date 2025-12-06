@@ -98,6 +98,31 @@ int main()
 		float(screen_x) / instbgtexture.getSize().x,
 		float(screen_y) / instbgtexture.getSize().y);
 
+	Texture inst_Pbgtexture;
+	if (!inst_Pbgtexture.loadFromFile("inst_P.png"))
+	{
+		cerr << "Failed to load inst_P.png. Make sure the file exists in the working directory!" << endl;
+		return -1;
+	}
+
+	Sprite inst_Pbgsprite;
+	inst_Pbgsprite.setTexture(inst_Pbgtexture);
+	inst_Pbgsprite.setScale(
+		float(screen_x) / inst_Pbgtexture.getSize().x,
+		float(screen_y) / inst_Pbgtexture.getSize().y);
+
+	Texture pausebgtexture;
+	if (!pausebgtexture.loadFromFile("pause.png"))
+	{
+		cerr << "Failed to load pause.png. Make sure the file exists in the working directory!" << endl;
+		return -1;
+	}
+
+	Sprite pausebgsprite;
+	pausebgsprite.setTexture(pausebgtexture);
+	pausebgsprite.setScale(1,1);
+	pausebgsprite.setPosition(330,250);
+
 	Font font;
 	if (!font.loadFromFile("Aileron.ttf"))
 	{
@@ -154,10 +179,13 @@ int main()
 	window.draw(menubgsprite); // background first
 							   // Menu options text
 	const int numButtons = 3;
+	const int numButtons_P=4;
 	
 	string labels[numButtons] = {"START GAME", "INSTRUCTIONS", "QUIT"};
+	string label[numButtons_P]={"RESUME","RESTART","MAIN MENU","INSTRUCTION"};
 	
 	Text buttonText[numButtons];
+	Text buttonText_P[numButtons_P];
 
 	
 
@@ -165,24 +193,38 @@ int main()
 	{
 		
 		 buttonText[i].setFillColor(Color (255, 140, 0)); // darkblue
-		
-	
-
 		// Button label
 		buttonText[i].setFont(font);
 		buttonText[i].setString(labels[i]);
 		buttonText[i].setCharacterSize(40);
 		buttonText[i].setFillColor(Color(255, 140, 0));
-		buttonText[i].setPosition(550, 330 + i * 120);
-
+		// buttonText[i].setPosition(550, 330 + i * 120);
+	}
+	
+	for (int i = 0; i < numButtons_P; i++)
+	{
 		
+		buttonText_P[i].setFillColor(Color (255, 140, 0)); // darkblue
+		// Button label
+		buttonText_P[i].setFont(font);
+		buttonText_P[i].setString(label[i]);
+		buttonText_P[i].setCharacterSize(20);
+		buttonText_P[i].setFillColor(Color(255, 140, 0));
+		// buttonText[i].setPosition(550, 330 + i * 120);
 	}
 	buttonText[0].setPosition(450, 330 + 0 * 120);
 	buttonText[1].setPosition(430, 330 + 1 * 120);
 	buttonText[2].setPosition(520, 330 + 2 * 120);
+	buttonText_P[0].setPosition(530, 365);
+	buttonText_P[1].setPosition(527, 330 + 1 * 120);
+	buttonText_P[2].setPosition(515, 285+ 2 * 120);
+	buttonText_P[3].setPosition(505, 360 + 2 * 120);
 
 	int selectedButton = 0;
 	buttonText[selectedButton].setFillColor(Color(100, 100, 255)); // glow for selected
+
+	int selectedButton_P = 0;
+	buttonText_P[selectedButton_P].setFillColor(Color(100, 100, 255));
 
 	int selectedplayer=0,numplayers=2;
 	if(selectedplayer==0)
@@ -293,6 +335,7 @@ int main()
 	lvl[7][8] = '#';
 	lvl[7][9] = '#';
 
+	int prev;
 	Event ev;
 	// main loop
 	while (window.isOpen())
@@ -351,6 +394,36 @@ int main()
 					}
 					
 				}
+				else if(current==4)
+				{
+					if (current == 4 && ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape)
+			window.close();
+					if (ev.key.code == Keyboard::Down)
+					{
+						buttonText_P[selectedButton_P].setFillColor(Color(255, 140, 0)); // reset color
+						selectedButton_P = (selectedButton_P + 1) % numButtons_P;
+						buttonText_P[selectedButton_P].setFillColor(Color(0, 0, 255)); // glow
+					}
+					else if (ev.key.code == Keyboard::Up)
+					{
+						buttonText_P[selectedButton_P].setFillColor(Color(255, 140, 0));
+						selectedButton_P = (selectedButton_P + numButtons_P - 1) % numButtons_P;
+						buttonText_P[selectedButton_P].setFillColor(Color(0, 0, 255));
+					}
+					else if(ev.key.code == Keyboard::Enter)
+					{
+						if(selectedButton_P==0)
+						current=3;
+						else if(selectedButton_P==1)
+						current=3;
+						else if(selectedButton_P==2)
+						current=0;
+						else if(selectedButton_P==3)
+						{current=1;
+							 prev=4;}
+					}
+				}
+
 			}
 		}
 
@@ -368,7 +441,7 @@ int main()
 		{
 			window.draw(menubgsprite);
 			// window.draw(buttonbgsprite);
-			for (int i = 0; i < numButtons; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				// window.draw(buttons[i]);
 				window.draw(buttonText[i]);
@@ -377,13 +450,22 @@ int main()
 
 		else if (current == 1)
 		{
-			window.draw(instbgsprite);
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape)
+			if(prev==4)
+				window.draw(inst_Pbgsprite);
+			else
+				window.draw(instbgsprite);
+			if(prev==4&&ev.type == Event::KeyPressed && ev.key.code == Keyboard::E)
+			{
+				current=4;
+			}
+			else if (prev==4&&(ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape))
 			{
 				window.draw(menubgsprite);
 				
 				current = 0; // ← Go back to main menu
+
 			}
+			
 		}
 
 		else if(current==2)
@@ -409,7 +491,7 @@ int main()
 		{
 			if (current == 3 && ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape)
 			{
-				window.close();
+				current=4;
 			}
 			
 			display_level(window, lvl, bgTex, bgSprite, blockTexture, blockSprite, height, width, cell_size);
@@ -427,6 +509,19 @@ int main()
 			}
 
 			
+		}
+		else if(current==4)
+		{
+			display_level(window, lvl, bgTex, bgSprite, blockTexture, blockSprite, height, width, cell_size);
+			window.draw(pausebgsprite);
+
+			for(int i=0;i<numButtons_P;i++)
+			{
+				window.draw(buttonText_P[i]);
+			}
+
+			if (current == 4 && ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape)
+			window.close();
 		}
 
 		window.display();
